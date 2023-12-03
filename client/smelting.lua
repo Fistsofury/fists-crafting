@@ -1,5 +1,3 @@
-FeatherMenu = exports['feather-menu'].initiate()
-
 RegisterNetEvent('smelting:openMenu')
 AddEventHandler('smelting:openMenu', function()
     openSmeltingMenu()

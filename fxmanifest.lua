@@ -7,13 +7,8 @@ author 'Fistsofury'
 description 'XP Crafting script for VORP'
 
 client_scripts {
-    'client/apothecary.lua',
-    'client/brewing.lua',
-    'client/carpentry.lua',
-    'client/cooking.lua',
-    'client/crafting.lua',
-    'client/smelting.lua',
-	'client/client.lua'
+    'client/helpers/functions.lua',
+    'client/*.lua'
 }
 
 shared_scripts {
@@ -24,4 +19,3 @@ shared_scripts {
 server_scripts {
 	'server/server.lua'
 }
-
