@@ -8,7 +8,8 @@ description 'XP Crafting script for VORP'
 
 client_scripts {
     'client/helpers/functions.lua',
-    'client/*.lua'
+    'client/client.lua',
+    'client/menu/*.lua'
 }
 
 shared_scripts {

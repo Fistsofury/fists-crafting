@@ -5,7 +5,7 @@ CreateThread(function() --PROMPT FOR SMELTING
         Wait(5)
         local playerCoords = GetEntityCoords(PlayerPedId())
         local nearSmeltingLocation = false
-        for key, location in pairs(Config.SmeltingLocations) do
+        for key, location in pairs(Config.Locations.SmeltingLocations) do
             if #(playerCoords - location.coords) < someThresholdDistance then
                 nearSmeltingLocation = true
                 break
@@ -22,7 +22,16 @@ CreateThread(function() --PROMPT FOR SMELTING
     end
 end)
 
+
 RegisterCommand('smelting', function()
+    TriggerEvent('smelting:openMenu')
+end, false)
+
+RegisterCommand('apothecary', function()
+    TriggerEvent('smelting:openMenu')
+end, false)
+
+RegisterCommand('crafting', function()
     TriggerEvent('smelting:openMenu')
 end, false)
 
