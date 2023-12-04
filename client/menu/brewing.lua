@@ -26,6 +26,21 @@ function openBrewingMenu()
             end
             recipePage:RegisterElement('textdisplay', { value = ingredientsList })
 
+            local maxQuantity = Config.BrewingQuantity or 10  -- Default to 10 if not specified
+            local quantity = 1
+            recipePage:RegisterElement('slider', {
+                label = "Quantity",
+                start = 1,
+                min = 1,
+                max = maxQuantity,
+                steps = 1, 
+            }, function(data)
+                quantity = data.value
+                if config.debug then
+                    print("Brewing " .. recipe.name .. " x" .. qunatity)
+                end
+            end)
+
             recipePage:RegisterElement('button', {
                 label = "Brew",
             }, function()

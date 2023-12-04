@@ -10,7 +10,7 @@ function openApothecaryMenu()
     })
 
     local mainPage = ApothecaryMenu:RegisterPage('main:page')
-    mainPage:RegisterElement('header', { value = 'Crafting Menu', slot = "header" })
+    mainPage:RegisterElement('header', { value = 'Mixing Menu', slot = "header" })
 
     for category, recipes in pairs(apothecaryCategories) do
         local categoryPage = ApothecaryMenu:RegisterPage('category:' .. category)
@@ -19,6 +19,13 @@ function openApothecaryMenu()
         for key, recipe in ipairs(recipes) do
             local recipePage = ApothecaryMenu:RegisterPage('recipe:' .. recipe.name)
             recipePage:RegisterElement('header', { value = recipe.label })
+            categoryPage:RegisterElement('button', {
+                label = "Back",
+                slot = "footer",
+            }, function()
+                mainPage:RouteTo()
+            end)
+
 
             local ingredientsList = "Ingredients:\n"
             for key, ingredient in pairs(recipe.requiredItems) do
@@ -26,18 +33,33 @@ function openApothecaryMenu()
             end
             recipePage:RegisterElement('textdisplay', { value = ingredientsList })
 
+            local maxQuantity = Config.ApothecaryQuantity or 10  -- Default to 10 if not specified
+            local quantity = 1
+            recipePage:RegisterElement('slider', {
+                label = "Quantity",
+                start = 1,
+                min = 1,
+                max = maxQuantity,
+                steps = 1, 
+            }, function(data)
+                quantity = data.value
+                if config.debug then
+                    print("Mixing " .. recipe.name .. " x" .. qunatity)
+                end
+            end)
+
             recipePage:RegisterElement('button', {
                 label = "Mix",
             }, function()
                 if config.debug then
-                print("Crafting " .. recipe.name)
+                print("Mixing " .. recipe.name)
                 end
             end)
 
             recipePage:RegisterElement('button', {
                 label = "Back",
             }, function()
-                categoryPage:RouteTo()
+                mainPage:RouteTo()
             end)
 
             categoryPage:RegisterElement('button', {

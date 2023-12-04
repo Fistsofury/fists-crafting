@@ -1,6 +1,9 @@
 CreateThread(function() --PROMPT FOR SMELTING
     local PromptGroup = BccUtils.Prompt:SetupPromptGroup() 
     local smeltingPrompt = PromptGroup:RegisterPrompt("Open Smelting", 0x4CC0E2FE, 1, 1, true, 'hold', {timedeventhash = "MEDIUM_TIMED_EVENT"}) 
+
+    local someThresholdDistance = 5.0  
+
     while true do
         Wait(5)
         local playerCoords = GetEntityCoords(PlayerPedId())
@@ -23,16 +26,17 @@ CreateThread(function() --PROMPT FOR SMELTING
 end)
 
 
+
 RegisterCommand('smelting', function()
     TriggerEvent('smelting:openMenu')
 end, false)
 
 RegisterCommand('apothecary', function()
-    TriggerEvent('smelting:openMenu')
+    TriggerEvent('apothecary:openMenu')
 end, false)
 
 RegisterCommand('crafting', function()
-    TriggerEvent('smelting:openMenu')
+    TriggerEvent('crafting:openMenu')
 end, false)
 
 
@@ -40,13 +44,15 @@ end, false)
 
 
 
+RegisterNetEvent('crafting:openMenu')
+AddEventHandler('crafting:openMenu', function()
+    openCraftingMenu()
+end)
 
-
-
-
-
-
-
+RegisterNetEvent('apothecary:openMenu')
+AddEventHandler('apothecary:openMenu', function()
+    openApothecaryMenu()
+end)
 
 RegisterNetEvent('smelting:openMenu')
 AddEventHandler('smelting:openMenu', function()

@@ -26,6 +26,21 @@ function openCraftingMenu()
             end
             recipePage:RegisterElement('textdisplay', { value = ingredientsList })
 
+            local maxQuantity = Config.CraftingQuantity or 10  -- Default to 10 if not specified
+            local quantity = 1
+            recipePage:RegisterElement('slider', {
+                label = "Quantity",
+                start = 1,
+                min = 1,
+                max = maxQuantity,
+                steps = 1, 
+            }, function(data)
+                quantity = data.value
+                if config.debug then
+                    print("Smelting " .. recipe.name .. " x" .. qunatity)
+                end
+            end)
+
             recipePage:RegisterElement('button', {
                 label = "Craft",
             }, function()
