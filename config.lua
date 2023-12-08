@@ -1,10 +1,16 @@
 Config = {
     debug = true,  -- Set to false to disable debug messages
+    
+    ApothecaryQuantity = 5, -- Maximum quantity on the crafting slider in each menu
+    BrewingQuantity = 10,
+    CarpentryQuantity = 10,
+    CookingQuantity = 10,
+    CraftingQuantity = 20,
+    SmelterQuantity = 50,
 
     Jobs = {
         SmelterJobs = {
-            "BWBlacksmith",
-            "woodworker" -- Add more jobs here or remove all jobs to make it pass the job check I.E not require a job.
+             -- Add more jobs here or remove all jobs to make it pass the job check I.E not require a job.
         },
 
         CarpentryJobs = {
@@ -23,8 +29,8 @@ Config = {
         },
 
         BrewingJobs = {
-            "carpenter",
-            "woodworker" -- Add more jobs here or remove all jobs to make it pass the job check I.E not require a job.
+           -- "carpenter",
+           -- "woodworker" -- Add more jobs here or remove all jobs to make it pass the job check I.E not require a job.
         },
 
         CookingJobs = {
@@ -74,8 +80,32 @@ Config = {
         ApothecaryRecipes = {
             {
                 name = "consumable_breakfast", -- db item name
-                label = "Breakfast",  --Label that you want to appear on the menu
-                category = "Food",  --what Category, changable to whatever you want
+                label = "Potion 1",  --Label that you want to appear on the menu
+                category = "Medicine",  --what Category, changable to whatever you want
+                requiredItems = { 
+                    {item = "meat", label = "Meat", quantity = 2},
+                    {item = "salt", label = "Salt", quantity = 1}
+                },
+                xpRequirement = 10, --Amount of xp needed to craft
+                xpReward = 0, --Amount of xp awarded for a succesful craft
+                --craftingTime = 5 -- time in seconds it takes to craft
+            },
+            {
+                name = "consumable_breakfast", -- db item name
+                label = "Potion 2",  --Label that you want to appear on the menu
+                category = "Medicine",  --what Category, changable to whatever you want
+                requiredItems = { 
+                    {item = "meat", label = "Meat", quantity = 2},
+                    {item = "salt", label = "Salt", quantity = 1}
+                },
+                xpRequirement = 10, --Amount of xp needed to craft
+                xpReward = 0, --Amount of xp awarded for a succesful craft
+                --craftingTime = 5 -- time in seconds it takes to craft
+            },
+            {
+                name = "consumable_breakfast", -- db item name
+                label = "Potion 3",  --Label that you want to appear on the menu
+                category = "Poison's",  --what Category, changable to whatever you want
                 requiredItems = { 
                     {item = "meat", label = "Meat", quantity = 2},
                     {item = "salt", label = "Salt", quantity = 1}
@@ -85,6 +115,7 @@ Config = {
                 --craftingTime = 5 -- time in seconds it takes to craft
             },
         },
+        
         SmeltingRecipes = {
             {
                 name = "goldbar", -- db item name

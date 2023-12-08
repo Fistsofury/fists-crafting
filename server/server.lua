@@ -11,8 +11,59 @@ RegisterNetEvent('fists-crafting:GetJob', function()
     TriggerClientEvent('fists-crafting:SendJob', source, playerJob)
 end)
 
+--Apothecary function
+exports.vorp_inventory:registerUsableItem("mortarpestle", function(data)
+    local _source = data.source
+ 
+    if Config.debug then
+    print("Data received in registerUsableItem callback:", _source, item, label)
+    end
+    if label == nil then
+        label = "Unknown Item"
+        if Config.debug then
+        print("Warning: label was nil. Setting default label.")
+        end
+    end
+    TriggerClientEvent('vorp:TipRight', _source, "You used a " .. label, 4000)
+    TriggerClientEvent('fists-crafting:mortarpestle', _source)
+end)
 
-VorpInv = exports.vorp_inventory:vorp_inventoryApi() --still needed?
+-- Cooking
+exports.vorp_inventory:registerUsableItem("campfire", function(data)
+    local _source = data.source
+ 
+    if Config.debug then
+    print("Data received in registerUsableItem callback:", _source, item, label)
+    end
+    if label == nil then
+        label = "Unknown Item"  
+        if Config.debug then
+        print("Warning: label was nil. Setting default label.")
+        end
+    end
+    TriggerClientEvent('vorp:TipRight', _source, "You used a " .. label, 4000)
+    TriggerClientEvent('fists-crafting:campfire', _source)
+end)
+
+--Brewing
+exports.vorp_inventory:registerUsableItem("cauldron", function(data)
+    local _source = data.source
+ 
+    if Config.debug then
+    print("Data received in registerUsableItem callback:", _source, item, label)
+    end
+    if label == nil then
+        label = "Unknown Item"  
+        if Config.debug then
+        print("Warning: label was nil. Setting default label.")
+        end
+    end
+    TriggerClientEvent('vorp:TipRight', _source, "You used a " .. label, 4000)
+    TriggerClientEvent('fists-crafting:campfireWithCauldron', _source)
+end)
+
+ 
+
 
 function CraftItem(source, recipe)
     local User = VORPcore.getUser(source)
