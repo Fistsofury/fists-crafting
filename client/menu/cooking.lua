@@ -51,6 +51,7 @@ function openCookingMenu()
 
             recipePage:RegisterElement('button', {
                 label = "Back",
+                id = "Back"
             }, function()
                 categoryPage:RouteTo()
             end)

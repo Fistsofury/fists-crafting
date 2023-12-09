@@ -1,6 +1,7 @@
 local smeltingCategories = groupRecipesByCategory(Config.Recipes.SmeltingRecipes)
 
 function openSmeltingMenu()
+    print("openSmeltingMenu function called")
     local smeltingMenu = FeatherMenu:RegisterMenu('smelting:menu', {
         style = {
             ['background-image'] = 'url("nui://fists-crafting/fists-background.png")',

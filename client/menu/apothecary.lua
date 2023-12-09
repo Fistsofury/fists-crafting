@@ -1,6 +1,5 @@
 local apothecaryCategories = groupRecipesByCategory(Config.Recipes.ApothecaryRecipes)
 
-
 function openApothecaryMenu()
     local ApothecaryMenu = FeatherMenu:RegisterMenu('apothecary:menu', {
         style = {
@@ -19,13 +18,6 @@ function openApothecaryMenu()
         for key, recipe in ipairs(recipes) do
             local recipePage = ApothecaryMenu:RegisterPage('recipe:' .. recipe.name)
             recipePage:RegisterElement('header', { value = recipe.label })
-            categoryPage:RegisterElement('button', {
-                label = "Back",
-                slot = "footer",
-            }, function()
-                mainPage:RouteTo()
-            end)
-
 
             local ingredientsList = "Ingredients:\n"
             for key, ingredient in pairs(recipe.requiredItems) do
@@ -44,7 +36,7 @@ function openApothecaryMenu()
             }, function(data)
                 quantity = data.value
                 if config.debug then
-                    print("Mixing " .. recipe.name .. " x" .. qunatity)
+                    print("Mixing " .. recipe.name .. " x" .. quantity)
                 end
             end)
 
@@ -52,14 +44,8 @@ function openApothecaryMenu()
                 label = "Mix",
             }, function()
                 if config.debug then
-                print("Mixing " .. recipe.name)
+                    print("Mixing " .. recipe.name)
                 end
-            end)
-
-            recipePage:RegisterElement('button', {
-                label = "Back",
-            }, function()
-                mainPage:RouteTo()
             end)
 
             categoryPage:RegisterElement('button', {
@@ -67,7 +53,20 @@ function openApothecaryMenu()
             }, function()
                 recipePage:RouteTo()
             end)
+
+            recipePage:RegisterElement('button', {
+                label = "Back",
+            }, function()
+                categoryPage:RouteTo()
+            end)
         end
+
+        categoryPage:RegisterElement('button', {
+            label = "Back",
+            slot = "footer",
+        }, function()
+            mainPage:RouteTo()
+        end)
 
         mainPage:RegisterElement('button', {
             label = category,

@@ -9,15 +9,15 @@ function openCarpentryMenu()
         draggable = true
     })
 
-    local mainPage = CarpentryMenu:RegisterPage('main:page')
+    local mainPage = carpentryMenu:RegisterPage('main:page')
     mainPage:RegisterElement('header', { value = 'Carpentry Menu', slot = "header" })
 
     for category, recipes in pairs(carpentryCategories) do
-        local categoryPage = CarpentryMenu:RegisterPage('category:' .. category)
+        local categoryPage = carpentryMenu:RegisterPage('category:' .. category)
         categoryPage:RegisterElement('header', { value = category })
 
         for key, recipe in ipairs(recipes) do
-            local recipePage = CarpentryMenu:RegisterPage('recipe:' .. recipe.name)
+            local recipePage = carpentryMenu:RegisterPage('recipe:' .. recipe.name)
             recipePage:RegisterElement('header', { value = recipe.label })
 
             local ingredientsList = "Ingredients:\n"
@@ -69,5 +69,5 @@ function openCarpentryMenu()
         end)
     end
 
-    CarpentryMenu:Open({ startupPage = mainPage })
+    carpentryMenu:Open({ startupPage = mainPage })
 end
