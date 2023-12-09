@@ -1,31 +1,36 @@
 local apothecaryCategories = groupRecipesByCategory(Config.Recipes.ApothecaryRecipes)
+local categoryXP = {}
 
 function openApothecaryMenu()
-    local ApothecaryMenu = FeatherMenu:RegisterMenu('apothecary:menu', {
+    local apothecaryMenu = FeatherMenu:RegisterMenu('apothecary:menu', {
         style = {
             ['background-image'] = 'url("nui://fists-crafting/fists-background.png")',
         },
         draggable = true
     })
 
-    local mainPage = ApothecaryMenu:RegisterPage('main:page')
+    local mainPage = apothecaryMenu:RegisterPage('main:page')
     mainPage:RegisterElement('header', { value = 'Mixing Menu', slot = "header" })
 
     for category, recipes in pairs(apothecaryCategories) do
-        local categoryPage = ApothecaryMenu:RegisterPage('category:' .. category)
+        local categoryPage = apothecaryMenu:RegisterPage('category:' .. category)
         categoryPage:RegisterElement('header', { value = category })
 
         for key, recipe in ipairs(recipes) do
-            local recipePage = ApothecaryMenu:RegisterPage('recipe:' .. recipe.name)
+            local recipePage = apothecaryMenu:RegisterPage('recipe:' .. recipe.name)
             recipePage:RegisterElement('header', { value = recipe.label })
 
+            local xpDisplayValue = categoryXP[category] and ("Your XP: " .. categoryXP[category]) or "Loading XP..."
+            recipePage:RegisterElement('textdisplay', { value = xpDisplayValue })
+
+
             local ingredientsList = "Ingredients:\n"
-            for key, ingredient in pairs(recipe.requiredItems) do
+            for _, ingredient in pairs(recipe.requiredItems) do
                 ingredientsList = ingredientsList .. ingredient.label .. " x" .. ingredient.quantity .. "\n"
             end
             recipePage:RegisterElement('textdisplay', { value = ingredientsList })
 
-            local maxQuantity = Config.ApothecaryQuantity or 10  -- Default to 10 if not specified
+            local maxQuantity = Config.ApothecaryQuantity or 10
             local quantity = 1
             recipePage:RegisterElement('slider', {
                 label = "Quantity",
@@ -35,18 +40,15 @@ function openApothecaryMenu()
                 steps = 1, 
             }, function(data)
                 quantity = data.value
-                if config.debug then
-                    print("Mixing " .. recipe.name .. " x" .. quantity)
-                end
             end)
 
-            recipePage:RegisterElement('button', {
-                label = "Mix",
-            }, function()
-                if config.debug then
-                    print("Mixing " .. recipe.name)
-                end
-            end)
+            -- Closure to capture the current recipe
+            local function mixButtonFunction()
+                print("Mixing button pressed: " .. recipe.name, "x" .. quantity)
+                TriggerServerEvent('fists-crafting:craftItem', 'Apothecary', recipe.name, quantity)
+            end
+
+            recipePage:RegisterElement('button', { label = "Mix" }, mixButtonFunction)
 
             categoryPage:RegisterElement('button', {
                 label = recipe.label,
@@ -54,9 +56,7 @@ function openApothecaryMenu()
                 recipePage:RouteTo()
             end)
 
-            recipePage:RegisterElement('button', {
-                label = "Back",
-            }, function()
+            recipePage:RegisterElement('button', { label = "Back" }, function()
                 categoryPage:RouteTo()
             end)
         end
@@ -75,5 +75,5 @@ function openApothecaryMenu()
         end)
     end
 
-    ApothecaryMenu:Open({ startupPage = mainPage })
+    apothecaryMenu:Open({ startupPage = mainPage })
 end

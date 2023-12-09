@@ -10,7 +10,7 @@ function openCarpentryMenu()
     })
 
     local mainPage = carpentryMenu:RegisterPage('main:page')
-    mainPage:RegisterElement('header', { value = 'Carpentry Menu', slot = "header" })
+    mainPage:RegisterElement('header', { value = 'Smelt Menu', slot = "header" })
 
     for category, recipes in pairs(carpentryCategories) do
         local categoryPage = carpentryMenu:RegisterPage('category:' .. category)
@@ -21,12 +21,12 @@ function openCarpentryMenu()
             recipePage:RegisterElement('header', { value = recipe.label })
 
             local ingredientsList = "Ingredients:\n"
-            for key, ingredient in pairs(recipe.requiredItems) do
+            for _, ingredient in pairs(recipe.requiredItems) do
                 ingredientsList = ingredientsList .. ingredient.label .. " x" .. ingredient.quantity .. "\n"
             end
             recipePage:RegisterElement('textdisplay', { value = ingredientsList })
 
-            local maxQuantity = Config.CarpentryQuantity or 10  -- Default to 10 if not specified
+            local maxQuantity = Config.CarpentryQuantity or 10
             local quantity = 1
             recipePage:RegisterElement('slider', {
                 label = "Quantity",
@@ -36,31 +36,33 @@ function openCarpentryMenu()
                 steps = 1, 
             }, function(data)
                 quantity = data.value
-                if config.debug then
-                    print("Smelting " .. recipe.name .. " x" .. qunatity)
-                end
             end)
 
-            recipePage:RegisterElement('button', {
-                label = "Build",
-            }, function()
-                if config.debug then
-                print("Crafting " .. recipe.name)
-                end
-            end)
+            -- Closure to capture the current recipe
+            local function buildButtonFunction()
+                print("Carpentry button pressed: " .. recipe.name, "x" .. quantity)
+                TriggerServerEvent('fists-crafting:craftItem', 'Carpentry', recipe.name, quantity)
+            end
 
-            recipePage:RegisterElement('button', {
-                label = "Back",
-            }, function()
-                categoryPage:RouteTo()
-            end)
+            recipePage:RegisterElement('button', { label = "Build" }, buildButtonFunction)
 
             categoryPage:RegisterElement('button', {
                 label = recipe.label,
             }, function()
                 recipePage:RouteTo()
             end)
+
+            recipePage:RegisterElement('button', { label = "Back" }, function()
+                categoryPage:RouteTo()
+            end)
         end
+
+        categoryPage:RegisterElement('button', {
+            label = "Back",
+            slot = "footer",
+        }, function()
+            mainPage:RouteTo()
+        end)
 
         mainPage:RegisterElement('button', {
             label = category,
@@ -71,3 +73,4 @@ function openCarpentryMenu()
 
     carpentryMenu:Open({ startupPage = mainPage })
 end
+

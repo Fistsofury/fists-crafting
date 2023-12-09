@@ -10,7 +10,7 @@ function openCookingMenu()
     })
 
     local mainPage = cookingMenu:RegisterPage('main:page')
-    mainPage:RegisterElement('header', { value = 'Cooking Menu', slot = "header" })
+    mainPage:RegisterElement('header', { value = 'Smelt Menu', slot = "header" })
 
     for category, recipes in pairs(cookingCategories) do
         local categoryPage = cookingMenu:RegisterPage('category:' .. category)
@@ -21,12 +21,12 @@ function openCookingMenu()
             recipePage:RegisterElement('header', { value = recipe.label })
 
             local ingredientsList = "Ingredients:\n"
-            for key, ingredient in pairs(recipe.requiredItems) do
+            for _, ingredient in pairs(recipe.requiredItems) do
                 ingredientsList = ingredientsList .. ingredient.label .. " x" .. ingredient.quantity .. "\n"
             end
             recipePage:RegisterElement('textdisplay', { value = ingredientsList })
 
-            local maxQuantity = Config.CookingQuantity or 10  -- Default to 10 if not specified
+            local maxQuantity = Config.CookingQuantity or 10
             local quantity = 1
             recipePage:RegisterElement('slider', {
                 label = "Quantity",
@@ -36,33 +36,33 @@ function openCookingMenu()
                 steps = 1, 
             }, function(data)
                 quantity = data.value
-                if config.debug then
-                    print("Cooking " .. recipe.name .. " x" .. qunatity)
-                end
             end)
 
-            recipePage:RegisterElement('button', {
-                label = "Cook",
-            }, function()
-                if config.debug then
-                print("Cooking " .. recipe.name)
-                end
-            end)
+            -- Closure to capture the current recipe
+            local function cookButtonFunction()
+                print("Cooking button pressed: " .. recipe.name, "x" .. quantity)
+                TriggerServerEvent('fists-crafting:craftItem', 'Cooking', recipe.name, quantity)
+            end
 
-            recipePage:RegisterElement('button', {
-                label = "Back",
-                id = "Back"
-            }, function()
-                categoryPage:RouteTo()
-            end)
-    
+            recipePage:RegisterElement('button', { label = "Cook" }, cookButtonFunction)
 
             categoryPage:RegisterElement('button', {
                 label = recipe.label,
             }, function()
                 recipePage:RouteTo()
             end)
+
+            recipePage:RegisterElement('button', { label = "Back" }, function()
+                categoryPage:RouteTo()
+            end)
         end
+
+        categoryPage:RegisterElement('button', {
+            label = "Back",
+            slot = "footer",
+        }, function()
+            mainPage:RouteTo()
+        end)
 
         mainPage:RegisterElement('button', {
             label = category,
@@ -73,3 +73,4 @@ function openCookingMenu()
 
     cookingMenu:Open({ startupPage = mainPage })
 end
+

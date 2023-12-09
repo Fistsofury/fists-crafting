@@ -1,7 +1,7 @@
 local smeltingCategories = groupRecipesByCategory(Config.Recipes.SmeltingRecipes)
 
+
 function openSmeltingMenu()
-    print("openSmeltingMenu function called")
     local smeltingMenu = FeatherMenu:RegisterMenu('smelting:menu', {
         style = {
             ['background-image'] = 'url("nui://fists-crafting/fists-background.png")',
@@ -10,7 +10,7 @@ function openSmeltingMenu()
     })
 
     local mainPage = smeltingMenu:RegisterPage('main:page')
-    mainPage:RegisterElement('header', { value = 'Smelting Menu', slot = "header" })
+    mainPage:RegisterElement('header', { value = 'Smelt Menu', slot = "header" })
 
     for category, recipes in pairs(smeltingCategories) do
         local categoryPage = smeltingMenu:RegisterPage('category:' .. category)
@@ -20,54 +20,49 @@ function openSmeltingMenu()
             local recipePage = smeltingMenu:RegisterPage('recipe:' .. recipe.name)
             recipePage:RegisterElement('header', { value = recipe.label })
 
-            categoryPage:RegisterElement('button', {
-                label = "Back",
-                slot = "footer",
-            }, function()
-                mainPage:RouteTo()
-            end)
-
             local ingredientsList = "Ingredients:\n"
-            for key, ingredient in pairs(recipe.requiredItems) do
+            for _, ingredient in pairs(recipe.requiredItems) do
                 ingredientsList = ingredientsList .. ingredient.label .. " x" .. ingredient.quantity .. "\n"
             end
             recipePage:RegisterElement('textdisplay', { value = ingredientsList })
 
-            local maxQuantity = Config.SmelterQuantity or 10  -- Default to 10 if not specified
+            local maxQuantity = Config.SmeltingQuantity or 10
             local quantity = 1
             recipePage:RegisterElement('slider', {
                 label = "Quantity",
                 start = 1,
                 min = 1,
                 max = maxQuantity,
-                steps = 1,
+                steps = 1, 
             }, function(data)
                 quantity = data.value
-                if Config.debug then
-                    print("Selected quantity: " .. quantity)
-                end
             end)
 
-            recipePage:RegisterElement('button', {
-                label = "Smelt",
-            }, function()
-                if config.debug then
-                print("Smelting " .. recipe.name)
-                end
-            end)
+            -- Closure to capture the current recipe
+            local function mixButtonFunction()
+                print("Smelting button pressed: " .. recipe.name, "x" .. quantity)
+                TriggerServerEvent('fists-crafting:craftItem', 'Smelting', recipe.name, quantity)
+            end
 
-            recipePage:RegisterElement('button', {
-                label = "Back",
-            }, function()
-                categoryPage:RouteTo()
-            end)
+            recipePage:RegisterElement('button', { label = "Smelt" }, mixButtonFunction)
 
             categoryPage:RegisterElement('button', {
                 label = recipe.label,
             }, function()
                 recipePage:RouteTo()
             end)
+
+            recipePage:RegisterElement('button', { label = "Back" }, function()
+                categoryPage:RouteTo()
+            end)
         end
+
+        categoryPage:RegisterElement('button', {
+            label = "Back",
+            slot = "footer",
+        }, function()
+            mainPage:RouteTo()
+        end)
 
         mainPage:RegisterElement('button', {
             label = category,
@@ -78,3 +73,4 @@ function openSmeltingMenu()
 
     smeltingMenu:Open({ startupPage = mainPage })
 end
+

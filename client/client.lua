@@ -123,13 +123,13 @@ function handleCraftingStation(stationType, promptTitle, craftingEvent, location
         end
 
         local allowedToUse = not checkJob or (#Config.Jobs[stationType..'Jobs'] == 0) or table.includes(Config.Jobs[stationType..'Jobs'], playerJob)
-        print("Checking station: " .. stationType)
+        --print("Checking station: " .. stationType)
 
 
         if nearStation and allowedToUse then
             PromptGroup:ShowGroup(promptTitle)
             if craftingPrompt:HasCompleted() then
-                print("Prompt completed for " .. stationType)
+                --print("Prompt completed for " .. stationType)
                 TriggerEvent(craftingEvent)
             end
         else

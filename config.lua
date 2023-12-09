@@ -24,8 +24,8 @@ Config = {
         },
 
         ApothecaryJobs = {
-            "carpenter",
-            "woodworker" -- Add more jobs here or remove all jobs to make it pass the job check I.E not require a job.
+            --"carpenter",
+            --"woodworker" -- Add more jobs here or remove all jobs to make it pass the job check I.E not require a job.
         },
 
         BrewingJobs = {
@@ -79,15 +79,15 @@ Config = {
         },
         ApothecaryRecipes = {
             {
-                name = "consumable_breakfast", -- db item name
+                name = "consumable_game", -- db item name
                 label = "Potion 1",  --Label that you want to appear on the menu
                 category = "Medicine",  --what Category, changable to whatever you want
                 requiredItems = { 
-                    {item = "meat", label = "Meat", quantity = 2},
-                    {item = "salt", label = "Salt", quantity = 1}
+                    {item = "corn", label = "Corn", quantity = 2},
+                    {item = "copper", label = "Copper", quantity = 1}
                 },
-                xpRequirement = 10, --Amount of xp needed to craft
-                xpReward = 0, --Amount of xp awarded for a succesful craft
+                xpRequirement = 0, --Amount of xp needed to craft
+                xpReward = 2, --Amount of xp awarded for a succesful craft
                 --craftingTime = 5 -- time in seconds it takes to craft
             },
             {
@@ -95,20 +95,19 @@ Config = {
                 label = "Potion 2",  --Label that you want to appear on the menu
                 category = "Medicine",  --what Category, changable to whatever you want
                 requiredItems = { 
-                    {item = "meat", label = "Meat", quantity = 2},
-                    {item = "salt", label = "Salt", quantity = 1}
+                    {item = "corn", label = "Corn", quantity = 3},
                 },
                 xpRequirement = 10, --Amount of xp needed to craft
                 xpReward = 0, --Amount of xp awarded for a succesful craft
                 --craftingTime = 5 -- time in seconds it takes to craft
             },
             {
-                name = "consumable_breakfast", -- db item name
+                name = "consumable_medicine", -- db item name
                 label = "Potion 3",  --Label that you want to appear on the menu
                 category = "Poison's",  --what Category, changable to whatever you want
                 requiredItems = { 
-                    {item = "meat", label = "Meat", quantity = 2},
-                    {item = "salt", label = "Salt", quantity = 1}
+                    {item = "clay", label = "Clay", quantity = 2},
+                    {item = "coal", label = "Coal", quantity = 1}
                 },
                 xpRequirement = 10, --Amount of xp needed to craft
                 xpReward = 0, --Amount of xp awarded for a succesful craft

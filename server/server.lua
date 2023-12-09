@@ -1,9 +1,8 @@
-local VORPcore = {}
+local VORPcore = {} 
+
 TriggerEvent("getCore", function(core)
     VORPcore = core
-    print("VORPcore set:", VORPcore)
 end)
-
 
 RegisterNetEvent('fists-crafting:GetJob', function()
     local Character = VORPcore.getUser(source).getUsedCharacter
@@ -62,114 +61,88 @@ exports.vorp_inventory:registerUsableItem("cauldron", function(data)
     TriggerClientEvent('fists-crafting:campfireWithCauldron', _source)
 end)
 
+ ---Apothecary Craft Item function
+ RegisterNetEvent('fists-crafting:craftItem')
+ AddEventHandler('fists-crafting:craftItem', function(recipeHeader, recipeName, quantity)
+     local source = source
+     local recipeList = Config.Recipes[recipeHeader .. "Recipes"]
+     if not recipeList then
+         VORPcore.NotifyRightTip(source, "Invalid recipe header: " .. recipeHeader, 4000)
+         return
+     end
+ 
+     local recipe = nil
+     for _, r in ipairs(recipeList) do
+         if r.name == recipeName then
+             recipe = r
+             break
+         end
+     end
+ 
+     if not recipe then
+         VORPcore.NotifyRightTip(source, "No recipe found for: " .. recipeName, 4000)
+         return
+     end
+     local User = VORPcore.getUser(source)
+     local Character = User.getUsedCharacter
+     local charidentifier = Character.charIdentifier
+ 
+     exports.oxmysql:fetch('SELECT * FROM CharacterCraftingXP WHERE CharIdentifier = ? AND RecipeHeader = ? AND Category = ?', {charidentifier, recipeHeader, recipe.category}, function(result)
+         if #result == 0 then
+             exports.oxmysql:execute('INSERT INTO CharacterCraftingXP (CharIdentifier, RecipeHeader, Category, XP) VALUES (?, ?, ?, 0)', {charidentifier, recipeHeader, recipe.category})
+         end
+ 
+         if recipe.xpRequirement > 0 then
+             local xp = result[1] and result[1].XP or 0
+             if xp < recipe.xpRequirement then
+                 VORPcore.NotifyRightTip(source, "You do not have enough XP to craft this item.", 4000)
+                 return
+             end
+         end
+         local requiredItems = recipe.requiredItems
+         for _, ingredient in pairs(requiredItems) do
+             local itemCount = exports.vorp_inventory:getItemCount(source, nil, ingredient.item)
+             if itemCount < ingredient.quantity * quantity then
+                 VORPcore.NotifyRightTip(source, "Insufficient Ingredients", 4000)
+                 return
+             end
+         end
+         local canCarry = exports.vorp_inventory:canCarryItem(source, recipe.name, quantity)
+         if not canCarry then
+             VORPcore.NotifyRightTip(source, "Inventory Full", 4000)
+             return
+         end
+         for _, ingredient in pairs(requiredItems) do
+             exports.vorp_inventory:subItem(source, ingredient.item, ingredient.quantity * quantity)
+         end
+         exports.vorp_inventory:addItem(source, recipe.name, quantity)
+         VORPcore.NotifyRightTip(source, "Crafting Successful", 4000)
+         exports.oxmysql:execute('UPDATE CharacterCraftingXP SET XP = XP + ? WHERE CharIdentifier = ? AND RecipeHeader = ? AND Category = ?', {recipe.xpReward, charidentifier, recipeHeader, recipe.category})
+     end)
+ end)
+ 
  
 
 
-function CraftItem(source, recipe)
-    local User = VORPcore.getUser(source)
-    local Character = User.getUsedCharacter
-    local identifier = Character.identifier
-    local charidentifier = Character.charIdentifier
-    if not recipe then
-        TriggerClientEvent("vorp:TipRight", source, "This recipe doesn't exist.", 5000)
-        return
-    end
-    exports.oxmysql:fetch('SELECT xp FROM crafting_xp WHERE charidentifier = ? AND category = ?', {charidentifier, recipe.category}, function(result) -- DB check for XP
-        if #result == 0 then
-            exports.oxmysql:execute('INSERT INTO crafting_xp (charidentifier, category, xp) VALUES (?, ?, 0)', {charidentifier, recipe.category}) --IF XP then update
-        else
-            local xp = result[1].xp
-            if xp < recipe.xpRequirement then
-                TriggerClientEvent("vorp:TipRight", source, "You don't have enough XP to craft this item.", 5000)
-                return
-            end
-        end
-        local missingItems = {}
-        for _, ingredientInfo in pairs(recipe.requiredItems) do -- loop recipes
-            local ingredient = ingredientInfo.item
-            local quantity = tonumber(ingredientInfo.quantity)
-            local playerItemCount = VorpInv.getItemCount(source, ingredient)
-            
-            if playerItemCount < quantity then
-                table.insert(missingItems, ingredientInfo.label)  
-            end
-        end
-        if #missingItems > 0 then --Missing items
-            local missingItemsStr = table.concat(missingItems, ", ")
-            TriggerClientEvent("vorp:TipRight", source, "You are missing the following ingredients: " .. missingItemsStr, 5000)
-            return
-        end
-        if not exports.vorp_inventory:canCarryItem(source, recipe.name, 1) then --Space check
-            TriggerClientEvent("vorp:TipRight", source, "You can't carry this item.", 5000)
-            return
-        end
-        -- Add a delay for the crafting time
-        Citizen.Wait(recipe.craftingTime * 1000)
-        for _, ingredientInfo in pairs(recipe.requiredItems) do
-            local ingredient = ingredientInfo.item
-            local quantity = tonumber(ingredientInfo.quantity)
-            VorpInv.subItem(source, ingredient, quantity)
-            print("Item taken", ingredient, quantity)
-        end
-        VorpInv.addItem(source, recipe.name, 1)
-        print("Item Added", recipe.name)
-        exports.oxmysql:execute('UPDATE crafting_xp SET xp = xp + ? WHERE charidentifier = ? AND category = ?', {recipe.xpReward, charidentifier, recipe.category})
-        TriggerClientEvent("vorp:TipRight", source, "You have crafted a " .. recipe.label .. ".", 5000)  
-    end)
-end
-
-RegisterNetEvent('getCraftingXP') --For XP to be displayed in the menu & send
-AddEventHandler('getCraftingXP', function(category)
-    local _source = source
-    local User = VORPcore.getUser(_source)
-    local charidentifier = User.getUsedCharacter.charIdentifier
-    exports.oxmysql:fetch('SELECT xp FROM crafting_xp WHERE charidentifier = ? AND category = ?', {charidentifier, category}, function(result)
-        if result and #result > 0 then
-            local xp = result[1].xp
-            if config.debug then
-                print("Fetched crafting XP for category: " .. category)
-            end
-            TriggerClientEvent('receiveCraftingXP', _source, category, xp)
-        else
-            if config.debug then
-                print("No crafting XP record found for category: " .. category)
-            end
-            TriggerClientEvent('receiveCraftingXP', _source, category, 0)  
-        end
-    end)
-end)
-
+ RegisterNetEvent('getCraftingXP') -- For XP to be displayed in the menu & send
+ AddEventHandler('getCraftingXP', function(category)
+     local _source = source
+     local User = VORPcore.getUser(_source)
+     local charidentifier = User.getUsedCharacter.charIdentifier
+ 
+     exports.oxmysql:fetch('SELECT xp FROM CharacterCraftingXP WHERE CharIdentifier = ? AND RecipeHeader = ? AND Category = ?', {charidentifier, 'Apothecary', category}, function(result)
+         local xp = 0
+         if result and #result > 0 then
+             xp = result[1].xp
+         end
+         TriggerClientEvent('receiveCraftingXP', _source, 'Apothecary', category, xp)
+     end)
+ end)
+ 
+ 
 RegisterServerEvent('fists-crafting:startCraftingAnimation')
 AddEventHandler('fists-crafting:startCraftingAnimation', function(duration)
     local _source = source
     TriggerClientEvent('playCraftingAnimation', _source, duration)
 end)
 
-RegisterServerEvent("fists-crafting:craftItem1")
-AddEventHandler("fists-crafting:craftItem1", function(itemName)
-    local _source = source
-    local recipe = nil
-    for _, r in pairs(Config.recipes) do
-        if r.name == itemName then
-            recipe = r
-            break
-        end
-    end
-
-    if recipe then
-        CraftItem(_source, recipe)
-    else
-        print("Recipe not found:", itemName)
-    end
-end)
-
-RegisterNetEvent('fists-crafting:getRecipes')
-AddEventHandler('fists-crafting:getRecipes', function()
-    if config.debug then
-    print(" get recipes triggered")  --  print
-    end
-    local _source = source
-    local recipesToSend = Config.recipes
-
-    TriggerClientEvent('fists-crafting:receiveRecipes', source, recipesToSend)
-end)

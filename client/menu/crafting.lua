@@ -2,31 +2,31 @@ local craftingCategories = groupRecipesByCategory(Config.Recipes.CraftingRecipes
 
 
 function openCraftingMenu()
-    local CraftingMenu = FeatherMenu:RegisterMenu('crafting:menu', {
+    local craftingMenu = FeatherMenu:RegisterMenu('crafting:menu', {
         style = {
             ['background-image'] = 'url("nui://fists-crafting/fists-background.png")',
         },
         draggable = true
     })
 
-    local mainPage = CraftingMenu:RegisterPage('main:page')
-    mainPage:RegisterElement('header', { value = 'Crafting Menu', slot = "header" })
+    local mainPage = craftingMenu:RegisterPage('main:page')
+    mainPage:RegisterElement('header', { value = 'Smelt Menu', slot = "header" })
 
     for category, recipes in pairs(craftingCategories) do
-        local categoryPage = CraftingMenu:RegisterPage('category:' .. category)
+        local categoryPage = craftingMenu:RegisterPage('category:' .. category)
         categoryPage:RegisterElement('header', { value = category })
 
         for key, recipe in ipairs(recipes) do
-            local recipePage = CraftingMenu:RegisterPage('recipe:' .. recipe.name)
+            local recipePage = craftingMenu:RegisterPage('recipe:' .. recipe.name)
             recipePage:RegisterElement('header', { value = recipe.label })
 
             local ingredientsList = "Ingredients:\n"
-            for key, ingredient in pairs(recipe.requiredItems) do
+            for _, ingredient in pairs(recipe.requiredItems) do
                 ingredientsList = ingredientsList .. ingredient.label .. " x" .. ingredient.quantity .. "\n"
             end
             recipePage:RegisterElement('textdisplay', { value = ingredientsList })
 
-            local maxQuantity = Config.CraftingQuantity or 10  -- Default to 10 if not specified
+            local maxQuantity = Config.CraftingQuantity or 10
             local quantity = 1
             recipePage:RegisterElement('slider', {
                 label = "Quantity",
@@ -36,31 +36,33 @@ function openCraftingMenu()
                 steps = 1, 
             }, function(data)
                 quantity = data.value
-                if config.debug then
-                    print("Smelting " .. recipe.name .. " x" .. qunatity)
-                end
             end)
 
-            recipePage:RegisterElement('button', {
-                label = "Craft",
-            }, function()
-                if config.debug then
-                print("Crafting " .. recipe.name)
-                end
-            end)
+            -- Closure to capture the current recipe
+            local function craftButtonFunction()
+                print("Crafting button pressed: " .. recipe.name, "x" .. quantity)
+                TriggerServerEvent('fists-crafting:craftItem', 'Crafting', recipe.name, quantity)
+            end
 
-            recipePage:RegisterElement('button', {
-                label = "Back",
-            }, function()
-                categoryPage:RouteTo()
-            end)
+            recipePage:RegisterElement('button', { label = "Craft" }, craftButtonFunction)
 
             categoryPage:RegisterElement('button', {
                 label = recipe.label,
             }, function()
                 recipePage:RouteTo()
             end)
+
+            recipePage:RegisterElement('button', { label = "Back" }, function()
+                categoryPage:RouteTo()
+            end)
         end
+
+        categoryPage:RegisterElement('button', {
+            label = "Back",
+            slot = "footer",
+        }, function()
+            mainPage:RouteTo()
+        end)
 
         mainPage:RegisterElement('button', {
             label = category,
@@ -69,5 +71,6 @@ function openCraftingMenu()
         end)
     end
 
-    CraftingMenu:Open({ startupPage = mainPage })
+    craftingMenu:Open({ startupPage = mainPage })
 end
+
