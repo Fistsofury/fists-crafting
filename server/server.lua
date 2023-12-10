@@ -115,30 +115,12 @@ end)
          for _, ingredient in pairs(requiredItems) do
              exports.vorp_inventory:subItem(source, ingredient.item, ingredient.quantity * quantity)
          end
+         local totalXPAwarded = recipe.xpReward * quantity
          exports.vorp_inventory:addItem(source, recipe.name, quantity)
          VORPcore.NotifyRightTip(source, "Crafting Successful", 4000)
-         exports.oxmysql:execute('UPDATE CharacterCraftingXP SET XP = XP + ? WHERE CharIdentifier = ? AND RecipeHeader = ? AND Category = ?', {recipe.xpReward, charidentifier, recipeHeader, recipe.category})
+         exports.oxmysql:execute('UPDATE CharacterCraftingXP SET XP = XP + ? WHERE CharIdentifier = ? AND RecipeHeader = ? AND Category = ?', {totalXPAwarded, charidentifier, recipeHeader, recipe.category})
      end)
  end)
- 
- 
-
-
- RegisterNetEvent('getCraftingXP') -- For XP to be displayed in the menu & send
- AddEventHandler('getCraftingXP', function(category)
-     local _source = source
-     local User = VORPcore.getUser(_source)
-     local charidentifier = User.getUsedCharacter.charIdentifier
- 
-     exports.oxmysql:fetch('SELECT xp FROM CharacterCraftingXP WHERE CharIdentifier = ? AND RecipeHeader = ? AND Category = ?', {charidentifier, 'Apothecary', category}, function(result)
-         local xp = 0
-         if result and #result > 0 then
-             xp = result[1].xp
-         end
-         TriggerClientEvent('receiveCraftingXP', _source, 'Apothecary', category, xp)
-     end)
- end)
- 
  
 RegisterServerEvent('fists-crafting:startCraftingAnimation')
 AddEventHandler('fists-crafting:startCraftingAnimation', function(duration)

@@ -4,7 +4,7 @@ local cookingCategories = groupRecipesByCategory(Config.Recipes.CookingRecipes)
 function openCookingMenu()
     local cookingMenu = FeatherMenu:RegisterMenu('cooking:menu', {
         style = {
-            ['background-image'] = 'url("nui://fists-crafting/fists-background.png")',
+            --['background-image'] = 'url("nui://fists-crafting/fists-background.png")',
         },
         draggable = true
     })
@@ -40,8 +40,12 @@ function openCookingMenu()
 
             -- Closure to capture the current recipe
             local function cookButtonFunction()
+                if Config.debug then
                 print("Cooking button pressed: " .. recipe.name, "x" .. quantity)
-                TriggerServerEvent('fists-crafting:craftItem', 'Cooking', recipe.name, quantity)
+                end
+                progressbar.start("Cooking " .. recipe.label, recipe.craftingTime, function ()
+                    TriggerServerEvent('fists-crafting:craftItem', 'Cooking', recipe.name, quantity)
+                end, 'circle')
             end
 
             recipePage:RegisterElement('button', { label = "Cook" }, cookButtonFunction)

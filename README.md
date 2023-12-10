@@ -37,3 +37,5 @@
 # TO DO
 - Only show recipes on XP owned
 - Add configs for animation and props
+- add xp multiplier for amount crafted
+

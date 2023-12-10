@@ -5,6 +5,7 @@ local mortarpestleObjects = {}
 local campfireObjects = {}
 local brewingObjects = {}
 
+
 RegisterNetEvent('crafting:openMenu')
 AddEventHandler('crafting:openMenu', function()
     openCraftingMenu()
@@ -17,7 +18,6 @@ end)
 
 RegisterNetEvent('smelting:openMenu')
 AddEventHandler('smelting:openMenu', function()
-    print("Opening smelting menu")
     openSmeltingMenu()
 end)
 
@@ -48,7 +48,9 @@ function createPropAndPlayAnimation(propName, animName, animDuration, offsetX, o
         end
         local obj = BccUtils.Object:Create(propName, x, y, z, h, true, 'standard')
         if obj then
+            if Config.debug then
             print(propName .. " created")  
+            end
             table.insert(objectsTable, vector3(x, y, z))
         else
             print("Failed to create " .. propName) 
@@ -83,7 +85,9 @@ end
 
 
 RegisterNetEvent('fists-crafting:SendJob', function(job)
+    if Config.debug then
     print("Received job update: " .. job) 
+    end
     playerJob = job
 end)
 
@@ -123,13 +127,11 @@ function handleCraftingStation(stationType, promptTitle, craftingEvent, location
         end
 
         local allowedToUse = not checkJob or (#Config.Jobs[stationType..'Jobs'] == 0) or table.includes(Config.Jobs[stationType..'Jobs'], playerJob)
-        --print("Checking station: " .. stationType)
 
 
         if nearStation and allowedToUse then
             PromptGroup:ShowGroup(promptTitle)
             if craftingPrompt:HasCompleted() then
-                --print("Prompt completed for " .. stationType)
                 TriggerEvent(craftingEvent)
             end
         else
@@ -163,29 +165,29 @@ handleCraftingStation("Brewing", "Start Brewing", 'brewing:openMenu', nil, brewi
 end)
 
 
-RegisterCommand('smelting', function()
-    print("Smelting command triggered") 
-    TriggerEvent('smelting:openMenu')
-end, false)
+if Config.adminCommands then
+    RegisterCommand('smelting', function()
+        TriggerEvent('smelting:openMenu')
+    end, false)
 
-RegisterCommand('apothecary', function()
-    TriggerEvent('apothecary:openMenu')
-end, false)
+    RegisterCommand('apothecary', function()
+        TriggerEvent('apothecary:openMenu')
+    end, false)
 
-RegisterCommand('crafting', function()
-    TriggerEvent('crafting:openMenu')
-end, false)
+    RegisterCommand('crafting', function()
+        TriggerEvent('crafting:openMenu')
+    end, false)
 
-RegisterCommand('cooking', function()
-    TriggerEvent('cooking:openMenu')
-end, false)
+    RegisterCommand('cooking', function()
+        TriggerEvent('cooking:openMenu')
+    end, false)
 
-RegisterCommand('brewing', function()
-    TriggerEvent('brewing:openMenu')
-end, false)
+    RegisterCommand('brewing', function()
+        TriggerEvent('brewing:openMenu')
+    end, false)
 
-RegisterCommand('carpentry', function()
-    TriggerEvent('carpentry:openMenu')
-end, false)
-
+    RegisterCommand('carpentry', function()
+        TriggerEvent('carpentry:openMenu')
+    end, false)
+end
 

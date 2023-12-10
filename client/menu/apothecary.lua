@@ -1,10 +1,10 @@
 local apothecaryCategories = groupRecipesByCategory(Config.Recipes.ApothecaryRecipes)
-local categoryXP = {}
+
 
 function openApothecaryMenu()
     local apothecaryMenu = FeatherMenu:RegisterMenu('apothecary:menu', {
         style = {
-            ['background-image'] = 'url("nui://fists-crafting/fists-background.png")',
+            --['background-image'] = 'url("nui://fists-crafting/fists-background.png")',
         },
         draggable = true
     })
@@ -19,9 +19,6 @@ function openApothecaryMenu()
         for key, recipe in ipairs(recipes) do
             local recipePage = apothecaryMenu:RegisterPage('recipe:' .. recipe.name)
             recipePage:RegisterElement('header', { value = recipe.label })
-
-            local xpDisplayValue = categoryXP[category] and ("Your XP: " .. categoryXP[category]) or "Loading XP..."
-            recipePage:RegisterElement('textdisplay', { value = xpDisplayValue })
 
 
             local ingredientsList = "Ingredients:\n"
@@ -44,8 +41,12 @@ function openApothecaryMenu()
 
             -- Closure to capture the current recipe
             local function mixButtonFunction()
+                if Config.debug then
                 print("Mixing button pressed: " .. recipe.name, "x" .. quantity)
-                TriggerServerEvent('fists-crafting:craftItem', 'Apothecary', recipe.name, quantity)
+                end
+                progressbar.start("Mixing " .. recipe.label, recipe.craftingTime, function ()
+                    TriggerServerEvent('fists-crafting:craftItem', 'Apothecary', recipe.name, quantity)
+                end, 'circle')
             end
 
             recipePage:RegisterElement('button', { label = "Mix" }, mixButtonFunction)

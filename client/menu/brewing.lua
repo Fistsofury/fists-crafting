@@ -4,7 +4,7 @@ local brewingCategories = groupRecipesByCategory(Config.Recipes.BrewingRecipes)
 function openBrewingMenu()
     local brewingMenu = FeatherMenu:RegisterMenu('brewing:menu', {
         style = {
-            ['background-image'] = 'url("nui://fists-crafting/fists-background.png")',
+            --['background-image'] = 'url("nui://fists-crafting/fists-background.png")',
         },
         draggable = true
     })
@@ -40,8 +40,12 @@ function openBrewingMenu()
 
             -- Closure to capture the current recipe
             local function brewButtonFunction()
+                if Config.debug then
                 print("Brewing button pressed: " .. recipe.name, "x" .. quantity)
-                TriggerServerEvent('fists-crafting:craftItem', 'Brewing', recipe.name, quantity)
+                end
+                progressbar.start("Smelting " .. recipe.label, recipe.craftingTime, function ()
+                    TriggerServerEvent('fists-crafting:craftItem', 'Brewing', recipe.name, quantity)
+                end, 'circle')
             end
 
             recipePage:RegisterElement('button', { label = "Brew" }, brewButtonFunction)

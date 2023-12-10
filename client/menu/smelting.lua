@@ -4,7 +4,7 @@ local smeltingCategories = groupRecipesByCategory(Config.Recipes.SmeltingRecipes
 function openSmeltingMenu()
     local smeltingMenu = FeatherMenu:RegisterMenu('smelting:menu', {
         style = {
-            ['background-image'] = 'url("nui://fists-crafting/fists-background.png")',
+            --['background-image'] = 'url("nui://fists-crafting/fists-background.png")',
         },
         draggable = true
     })
@@ -15,9 +15,9 @@ function openSmeltingMenu()
     for category, recipes in pairs(smeltingCategories) do
         local categoryPage = smeltingMenu:RegisterPage('category:' .. category)
         categoryPage:RegisterElement('header', { value = category })
-
+        
         for key, recipe in ipairs(recipes) do
-            local recipePage = smeltingMenu:RegisterPage('recipe:' .. recipe.name)
+        local recipePage = smeltingMenu:RegisterPage('recipe:' .. recipe.name)
             recipePage:RegisterElement('header', { value = recipe.label })
 
             local ingredientsList = "Ingredients:\n"
@@ -39,12 +39,16 @@ function openSmeltingMenu()
             end)
 
             -- Closure to capture the current recipe
-            local function mixButtonFunction()
+            local function smeltButtonFunction()
+                if Config.debug then
                 print("Smelting button pressed: " .. recipe.name, "x" .. quantity)
-                TriggerServerEvent('fists-crafting:craftItem', 'Smelting', recipe.name, quantity)
+                end
+                progressbar.start("Smelting " .. recipe.label, recipe.craftingTime, function ()
+                    TriggerServerEvent('fists-crafting:craftItem', 'Smelting', recipe.name, quantity)
+                end, 'circle')
             end
 
-            recipePage:RegisterElement('button', { label = "Smelt" }, mixButtonFunction)
+            recipePage:RegisterElement('button', { label = "Smelt" }, smeltButtonFunction)
 
             categoryPage:RegisterElement('button', {
                 label = recipe.label,
@@ -55,6 +59,7 @@ function openSmeltingMenu()
             recipePage:RegisterElement('button', { label = "Back" }, function()
                 categoryPage:RouteTo()
             end)
+            
         end
 
         categoryPage:RegisterElement('button', {

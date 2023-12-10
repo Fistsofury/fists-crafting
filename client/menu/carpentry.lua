@@ -4,7 +4,7 @@ local carpentryCategories = groupRecipesByCategory(Config.Recipes.CarpentryRecip
 function openCarpentryMenu()
     local carpentryMenu = FeatherMenu:RegisterMenu('carpentry:menu', {
         style = {
-            ['background-image'] = 'url("nui://fists-crafting/fists-background.png")',
+            --['background-image'] = 'url("nui://fists-crafting/fists-background.png")',
         },
         draggable = true
     })
@@ -40,8 +40,12 @@ function openCarpentryMenu()
 
             -- Closure to capture the current recipe
             local function buildButtonFunction()
-                print("Carpentry button pressed: " .. recipe.name, "x" .. quantity)
-                TriggerServerEvent('fists-crafting:craftItem', 'Carpentry', recipe.name, quantity)
+                if Config.debug then
+                print("Build button pressed: " .. recipe.name, "x" .. quantity)
+                end
+                progressbar.start("Building " .. recipe.label, recipe.craftingTime, function ()
+                    TriggerServerEvent('fists-crafting:craftItem', 'Carpentry', recipe.name, quantity)
+                end, 'circle')
             end
 
             recipePage:RegisterElement('button', { label = "Build" }, buildButtonFunction)

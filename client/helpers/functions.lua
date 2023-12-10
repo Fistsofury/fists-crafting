@@ -5,6 +5,7 @@ TriggerEvent("getCore", function(core)
     VorpCore = core
 end)
 BccUtils = exports['bcc-utils'].initiate()
+progressbar = exports.vorp_progressbar:initiate()
 
 --Group recipes
 function groupRecipesByCategory(recipes)
@@ -27,3 +28,6 @@ function table.includes(table, value)
     end
     return false
 end
+
+
+
