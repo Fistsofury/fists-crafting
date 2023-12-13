@@ -33,9 +33,10 @@
 - BCC-Utils https://github.com/BryceCanyonCounty/bcc-utils 
 - Feather-Menu - https://github.com/FeatherFramework/feather-menu
 - Vorp_Animations - https://github.com/VORPCORE/vorp_animations
+- Vorp_Porgressbar
 
 # TO DO
 - Only show recipes on XP owned
 - Add configs for animation and props
-- add xp multiplier for amount crafted
+- Further optimisation
 

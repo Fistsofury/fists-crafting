@@ -14,7 +14,7 @@ Config = {
 
     Jobs = {
         SmelterJobs = {
-            --"carpenter"
+            --"carpenter",
             --"woodworker"
             -- Add more jobs here or remove all jobs to make it pass the job check I.E not require a job.
         },

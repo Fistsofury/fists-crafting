@@ -5,7 +5,6 @@ local mortarpestleObjects = {}
 local campfireObjects = {}
 local brewingObjects = {}
 
-
 RegisterNetEvent('crafting:openMenu')
 AddEventHandler('crafting:openMenu', function()
     openCraftingMenu()
@@ -76,8 +75,6 @@ RegisterNetEvent('fists-crafting:campfire', onCampfireUse)
 RegisterNetEvent('fists-crafting:campfireWithCauldron', onBrewingUse)
 
 
-
-
 function requestPlayerJob()
     TriggerServerEvent('fists-crafting:GetJob')
 end
@@ -98,12 +95,10 @@ function handleCraftingStation(stationType, promptTitle, craftingEvent, location
     local lastJobRequestTime = 0
 
     while true do
-        Citizen.Wait(0)
+        Citizen.Wait(5)
         local playerCoords = GetEntityCoords(PlayerPedId())
         local nearStation = false
         local promptVisible = false
-
-
         if objects then
             for objectId, objData in pairs(objects) do
                 local objCoords = objData.coords
@@ -116,8 +111,6 @@ function handleCraftingStation(stationType, promptTitle, craftingEvent, location
                 end
             end
         end
-
-
         if not nearStation and locations then
             for _, location in pairs(locations) do
                 if #(playerCoords - location.coords) < someThresholdDistance then
@@ -127,8 +120,6 @@ function handleCraftingStation(stationType, promptTitle, craftingEvent, location
                 end
             end
         end
-
-
         if nearStation then
             if (GetGameTimer() - lastJobRequestTime > 30000) then
                 requestPlayerJob()
@@ -160,16 +151,12 @@ function removePlacedObject(stationType)
         objectsTable = brewingObjects
     end
 
-    print("Attempting to remove objects for station type:", stationType)
     if objectsTable then
         for objectId, objData in pairs(objectsTable) do
-            print("Processing object with ID:", objectId)
             if objData.object and objData.object.Remove then
-                print("Found object with Remove method. Attempting to remove:", objectId)
                 objData.object:Remove()
-                print("Object removed with ID:", objectId)
             else
-
+                prin("Cannot perform remove")
             end
         end
         objectsTable = {}  

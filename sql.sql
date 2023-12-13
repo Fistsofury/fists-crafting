@@ -1,9 +1,9 @@
 CREATE TABLE CharacterCraftingXP (
     EntryID INT AUTO_INCREMENT PRIMARY KEY,
-    CharIdentifier VARCHAR(255) NOT NULL, -- Identifier for the character
-    RecipeHeader VARCHAR(255) NOT NULL,   -- e.g., Apothecary, Crafting
-    Category VARCHAR(255) NOT NULL,       -- e.g., Medicine, Food, Ore
-    XP INT NOT NULL DEFAULT 0             -- XP earned in this category
+    CharIdentifier VARCHAR(255) NOT NULL, 
+    RecipeHeader VARCHAR(255) NOT NULL,   
+    Category VARCHAR(255) NOT NULL,       
+    XP INT NOT NULL DEFAULT 0             
 );
 
 
