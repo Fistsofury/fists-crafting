@@ -76,7 +76,7 @@ Config = {
                 xpRequirement = 0, --Amount of xp needed to craft
                 xpReward = 1, --Amount of xp awarded for a succesful craft
                 craftingTime = 5000 -- time in milliseconds , 5 seconds
-            }
+            },
         },
         ApothecaryRecipes = { --for mixing potions pestle and mortar item
             {

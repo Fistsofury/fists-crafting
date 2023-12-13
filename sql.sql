@@ -8,8 +8,9 @@ CREATE TABLE CharacterCraftingXP (
 
 
 
---Insert SQL campfire should already exist
+
 INSERT INTO `items`(`item`, `label`, `limit`, `can_remove`, `type`, `usable`)
 VALUES
     ('cauldron', 'Cauldron', 5, 1, 'item_standard', 0),
+     ('cookingcampfire', 'Campfire', 5, 1, 'item_standard', 0),
     ('mortarpestle', 'Mortar and Pestle', 5, 1, 'item_standard', 0);

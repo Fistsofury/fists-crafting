@@ -107,7 +107,7 @@ exports.vorp_inventory:registerUsableItem("mortarpestle", function(data)
     handleUsableItem(data.source, "mortarpestle", 'fists-crafting:mortarpestle')
 end)
 
-exports.vorp_inventory:registerUsableItem("campfire", function(data)
+exports.vorp_inventory:registerUsableItem("cookingcampfire", function(data)
     handleUsableItem(data.source, "campfire", 'fists-crafting:campfire')
 end)
 
