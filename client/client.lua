@@ -37,28 +37,27 @@ AddEventHandler('carpentry:openMenu', function()
 end)
 
 
+local objectCounter = 0  
+
 function createPropAndPlayAnimation(propName, animName, animDuration, offsetX, offsetY, offsetZ, objectsTable)
     local playerPed = PlayerPedId()
     local x, y, z = table.unpack(GetOffsetFromEntityInWorldCoords(playerPed, offsetX, offsetY, offsetZ))
     local h = GetEntityHeading(playerPed)
-
     if BccUtils and BccUtils.Object then
         if animName and animDuration then
             Animations.playAnimation(animName, animDuration)
         end
         local obj = BccUtils.Object:Create(propName, x, y, z, h, true, 'standard')
         if obj then
-            if Config.debug then
-            print(propName .. " created")  
-            end
-            table.insert(objectsTable, vector3(x, y, z))
+            objectCounter = objectCounter + 1 
+            local objectId = "obj_" .. objectCounter
+            objectsTable[objectId] = { object = obj, coords = vector3(x, y, z) }
         else
-            print("Failed to create " .. propName) 
+            print("Failed to create " .. propName)
         end
-    else
-        print("BccUtils or BccUtils.Object not available")  
     end
 end
+
 
 function onMortarPestleUse()
     createPropAndPlayAnimation('p_mortarpestle01x', 'riverwash', 2000, 0.0, 1.0, -0.5, mortarpestleObjects)
@@ -102,43 +101,91 @@ function handleCraftingStation(stationType, promptTitle, craftingEvent, location
         Citizen.Wait(0)
         local playerCoords = GetEntityCoords(PlayerPedId())
         local nearStation = false
+        local promptVisible = false
 
 
-        if locations then
+        if objects then
+            for objectId, objData in pairs(objects) do
+                local objCoords = objData.coords
+                if #(playerCoords - objCoords) < someThresholdDistance and objData.object then
+                    nearStation = true
+                    if DoesEntityExist(objData.object:GetObj()) then  
+                        promptVisible = true
+                        break
+                    end
+                end
+            end
+        end
+
+
+        if not nearStation and locations then
             for _, location in pairs(locations) do
                 if #(playerCoords - location.coords) < someThresholdDistance then
                     nearStation = true
-                    break
-                end
-            end
-        elseif objects then
-            for _, objCoords in ipairs(objects) do
-                if #(playerCoords - objCoords) < someThresholdDistance then
-                    nearStation = true
+                    promptVisible = true
                     break
                 end
             end
         end
 
 
-        if nearStation and (GetGameTimer() - lastJobRequestTime > 30000) then
-            requestPlayerJob()
-            lastJobRequestTime = GetGameTimer()
-        end
-
-        local allowedToUse = not checkJob or (#Config.Jobs[stationType..'Jobs'] == 0) or table.includes(Config.Jobs[stationType..'Jobs'], playerJob)
-
-
-        if nearStation and allowedToUse then
-            PromptGroup:ShowGroup(promptTitle)
-            if craftingPrompt:HasCompleted() then
-                TriggerEvent(craftingEvent)
+        if nearStation then
+            if (GetGameTimer() - lastJobRequestTime > 30000) then
+                requestPlayerJob()
+                lastJobRequestTime = GetGameTimer()
+            end
+            local allowedToUse = not checkJob or (#Config.Jobs[stationType..'Jobs'] == 0) or table.includes(Config.Jobs[stationType..'Jobs'], playerJob)
+            if allowedToUse and promptVisible then
+                PromptGroup:ShowGroup(promptTitle)
+                if craftingPrompt:HasCompleted() then
+                    TriggerEvent(craftingEvent)
+                end
             end
         else
-           -- PromptGroup:HideGroup()
+            --PromptGroup:HideGroup()
         end
     end
 end
+
+
+
+
+function removePlacedObject(stationType)
+    local objectsTable
+    if stationType == 'cooking' then
+        objectsTable = campfireObjects
+    elseif stationType == 'apothecary' then
+        objectsTable = mortarpestleObjects
+    elseif stationType == 'brewing' then
+        objectsTable = brewingObjects
+    end
+
+    print("Attempting to remove objects for station type:", stationType)
+    if objectsTable then
+        for objectId, objData in pairs(objectsTable) do
+            print("Processing object with ID:", objectId)
+            if objData.object and objData.object.Remove then
+                print("Found object with Remove method. Attempting to remove:", objectId)
+                objData.object:Remove()
+                print("Object removed with ID:", objectId)
+            else
+
+            end
+        end
+        objectsTable = {}  
+    else
+        print("No objects table found for station type:", stationType)
+    end
+    TriggerServerEvent('fists-crafting:addCraftItem', stationType)
+end
+
+
+
+
+
+
+
+
 
 Citizen.CreateThread(function()
 handleCraftingStation("Smelter", "Open Smelting", 'smelting:openMenu', Config.Locations.SmeltingLocations, nil, true)

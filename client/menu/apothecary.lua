@@ -74,6 +74,14 @@ function openApothecaryMenu()
         }, function()
             categoryPage:RouteTo()
         end)
+
+        mainPage:RegisterElement('button', {
+            label = "Pick Up Pestle",
+            slot = "footer",
+        }, function()
+            removePlacedObject('apothecary')
+            apothecaryMenu:Close()
+        end)
     end
 
     apothecaryMenu:Open({ startupPage = mainPage })

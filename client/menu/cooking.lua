@@ -10,7 +10,7 @@ function openCookingMenu()
     })
 
     local mainPage = cookingMenu:RegisterPage('main:page')
-    mainPage:RegisterElement('header', { value = 'Smelt Menu', slot = "header" })
+    mainPage:RegisterElement('header', { value = 'Cooking Menu', slot = "header" })
 
     for category, recipes in pairs(cookingCategories) do
         local categoryPage = cookingMenu:RegisterPage('category:' .. category)
@@ -72,6 +72,14 @@ function openCookingMenu()
             label = category,
         }, function()
             categoryPage:RouteTo()
+        end)
+
+        mainPage:RegisterElement('button', {
+            label = "Pick Up Campfire",
+            slot = "footer",
+        }, function()
+            removePlacedObject('cooking')
+            cookingMenu:Close()
         end)
     end
 

@@ -73,6 +73,14 @@ function openBrewingMenu()
         }, function()
             categoryPage:RouteTo()
         end)
+
+        mainPage:RegisterElement('button', {
+            label = "Pick Up Cauldron",
+            slot = "footer",
+        }, function()
+            removePlacedObject('brewing')
+            brewingMenu:Close()
+        end)
     end
 
     brewingMenu:Open({ startupPage = mainPage })

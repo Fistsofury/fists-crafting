@@ -23,6 +23,7 @@ exports.vorp_inventory:registerUsableItem("mortarpestle", function(data)
         print("Warning: label was nil. Setting default label.")
         end
     end
+    exports.vorp_inventory:subItem(_source, "mortarpestle", 1)
     TriggerClientEvent('vorp:TipRight', _source, "You used a " .. label, 4000)
     TriggerClientEvent('fists-crafting:mortarpestle', _source)
 end)
@@ -40,6 +41,8 @@ exports.vorp_inventory:registerUsableItem("campfire", function(data)
         print("Warning: label was nil. Setting default label.")
         end
     end
+    exports.vorp_inventory:subItem(_source, "campfire", 1)
+    
     TriggerClientEvent('vorp:TipRight', _source, "You used a " .. label, 4000)
     TriggerClientEvent('fists-crafting:campfire', _source)
 end)
@@ -57,6 +60,7 @@ exports.vorp_inventory:registerUsableItem("cauldron", function(data)
         print("Warning: label was nil. Setting default label.")
         end
     end
+    exports.vorp_inventory:subItem(_source, "cauldron", 1)
     TriggerClientEvent('vorp:TipRight', _source, "You used a " .. label, 4000)
     TriggerClientEvent('fists-crafting:campfireWithCauldron', _source)
 end)
@@ -121,6 +125,21 @@ end)
          exports.oxmysql:execute('UPDATE CharacterCraftingXP SET XP = XP + ? WHERE CharIdentifier = ? AND RecipeHeader = ? AND Category = ?', {totalXPAwarded, charidentifier, recipeHeader, recipe.category})
      end)
  end)
+
+ RegisterNetEvent("fists-crafting:addCraftItem")
+ AddEventHandler("fists-crafting:addCraftItem", function(stationType)
+    local _source = source
+    local User = VORPcore.getUser(_source)
+    local Character = User.getUsedCharacter
+    if stationType == 'crafting' then
+        exports.vorp_inventory:addItem(_source, 'campfire', 1)  
+    elseif stationType == 'apothecary' then
+        exports.vorp_inventory:addItem(_source, 'mortarpestle', 1)  
+    elseif stationType == 'brewing' then
+        exports.vorp_inventory:addItem(_source, 'cauldron', 1)  
+    end
+
+end)
  
 RegisterServerEvent('fists-crafting:startCraftingAnimation')
 AddEventHandler('fists-crafting:startCraftingAnimation', function(duration)

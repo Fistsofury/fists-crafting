@@ -73,6 +73,14 @@ function openCraftingMenu()
         }, function()
             categoryPage:RouteTo()
         end)
+
+        mainPage:RegisterElement('button', {
+            label = "Pick Up Campfire",
+            slot = "footer",
+        }, function()
+            removePlacedObject('crafting')
+            print("clicked remove button")
+        end)
     end
 
     craftingMenu:Open({ startupPage = mainPage })
